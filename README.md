@@ -40,7 +40,7 @@ Bagan di atas menunjukkan alur request–response pada aplikasi Django. Ketika c
 ---
 
 # Jelaskan peran ```settings.py``` dalam proyek Django!
-File ```settings.py``` berfungsi sebagai pusat konfigurasi untuk proyek Django. Semua pengaturan utama proyek, seperti database, aplikasi yang digunakan (```INSTALLED_APPS```), ````middleware```, ```template```, ```static files```, keamanan (secret key, debug mode), serta daftar host yang diizinkan (```ALLOWED_HOSTS```) didefinisikan di sini.
+File ```settings.py``` berfungsi sebagai pusat konfigurasi untuk proyek Django. Semua pengaturan utama proyek, seperti database, aplikasi yang digunakan (```INSTALLED_APPS```), ```middleware```, ```template```, ```static files```, keamanan (secret key, debug mode), serta daftar host yang diizinkan (```ALLOWED_HOSTS```) didefinisikan di sini.
 
 Dengan kata lain, ```settings.py``` mengatur bagaimana aplikasi Django dijalankan dan berinteraksi dengan server, database, maupun pengguna.
 
