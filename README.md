@@ -24,7 +24,7 @@ Di file ```main/views.py```, saya membuat fungsi home_page untuk menampilkan hal
 Pada ```main/models.py```, saya membuat sebuah model Django bernama Product yang memiliki atribut sesuai kebutuhan Tugas 1. Selain itu, saya menambahkan atribut ```views``` untuk mengetahui berapa kali sebuah produk di lihat oleh pengguna dan ```id``` sebagai penanda produk dalam bentuk ```UUID```.
 
 ### 7. Setup Git dan Deploy ke PWS
-Saya sudah melakukan inisialisasi Git repository, kemudian push project ke ```PWS```. Setelah itu, saya juga deploy project ke GitHub Setelah memastikan aplikasi berjalan dengan baik, saya melakukan penyesuaian terakhir pada ````settings.py``` (menambahkan ```ALLOWED_HOSTS```), lalu melakukan push ulang ke GitHub dan ```PWS``` agar perubahan tersebut ter-deploy.
+Saya sudah melakukan inisialisasi Git repository, kemudian push project ke ```PWS```. Setelah itu, saya juga deploy project ke GitHub Setelah memastikan aplikasi berjalan dengan baik, saya melakukan penyesuaian terakhir pada ```settings.py``` (menambahkan ```ALLOWED_HOSTS```), lalu melakukan push ulang ke GitHub dan ```PWS``` agar perubahan tersebut ter-deploy.
 
 ### 8. Membuat README.md
 Terakhir, saya membuat file ```README.md``` yang berisi dokumentasi proyek. File ini mencakup link menuju repository GitHub, link aplikasi PWS, serta jawaban dari pertanyaan yang diberikan. Setelah itu, saya kembali melakukan push agar file ```README.md``` tersimpan di repository.
