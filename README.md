@@ -33,7 +33,8 @@ Terakhir, saya membuat file ```README.md``` yang berisi dokumentasi proyek. File
 
 # Buatlah bagan yang berisi request client ke web aplikasi berbasis Django beserta responnya dan jelaskan pada bagan tersebut kaitan antara ```urls.py```, ```views.py```, ```models.py```, dan berkas ```html```.
 
-<img width="1350" height="650" alt="image" src="https://github.com/user-attachments/assets/fd63449b-4aec-4089-8e50-8cdf1e3562bc" />
+![Client](https://github.com/user-attachments/assets/2a73dd07-ec03-400f-82c4-7fd2efc34d9c)
+
 
 Bagan di atas menunjukkan alur request–response pada aplikasi Django. Ketika client mengirim request, request tersebut pertama kali diarahkan ke ```urls.py``` untuk mencocokkan URL dengan fungsi view yang sesuai. Selanjutnya, ```views.py``` bertugas mengolah logika: jika butuh data, view akan berinteraksi dengan ```models.py``` untuk mengambil atau memodifikasi data di database. Setelah data tersedia, view akan memanggil template HTML untuk menampilkan data dalam bentuk yang terstruktur. Akhirnya, hasil render dikirim kembali sebagai response kepada client. Dengan demikian, keempat berkas ini saling berhubungan dalam memproses request hingga menghasilkan response.
 
