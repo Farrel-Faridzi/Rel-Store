@@ -15,7 +15,7 @@ class Product(models.Model):
     name = models.CharField(max_length=50)
     price = models.IntegerField()
     description = models.TextField()
-    thumbnail = models.URLField(blank=True, null=True)
+    image = models.URLField(blank=True, null=True)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='jersey')
     is_featured = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
