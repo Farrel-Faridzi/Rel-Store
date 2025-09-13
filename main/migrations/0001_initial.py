@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('price', models.IntegerField()),
                 ('description', models.TextField()),
                 ('image', models.URLField(blank=True, null=True)),
-                ('category', models.CharField(choices=[('cleat', 'Cleat'), ('glove', 'Glove'), ('shin guard', 'Shin guard'), ('sock', 'Sock'), ('jersey', 'Jersey'), ('football', 'Football')], default='jersey', max_length=20)),
+                ('category', models.CharField(choices=[('cleats', 'Cleats'), ('glove', 'Glove'), ('shin guard', 'Shin guard'), ('sock', 'Sock'), ('jersey', 'Jersey'), ('football', 'Football')], default='jersey', max_length=20)),
                 ('is_featured', models.BooleanField(default=False)),
                 ('views', models.IntegerField(default=0)),
             ],

@@ -7,13 +7,13 @@ class ProductTest(TestCase):
             name="Nike Mercurial",
             price=2500000,
             description="Sepatu bola terbaru",
-            category="cleat",
+            category="cleats",
             is_featured=True,
             views=10
         )
         self.assertEqual(product.name, "Nike Mercurial")
         self.assertEqual(product.price, 2500000)
-        self.assertEqual(product.category, "cleat")
+        self.assertEqual(product.category, "cleats")
         self.assertTrue(product.is_featured)
         self.assertEqual(product.views, 10)
 

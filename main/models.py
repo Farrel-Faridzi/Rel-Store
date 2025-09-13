@@ -3,7 +3,7 @@ from django.db import models
 
 class Product(models.Model):
     CATEGORY_CHOICES = [
-        ('cleat', 'Cleat'),
+        ('cleats', 'Cleats'),
         ('glove', 'Glove'),
         ('shin guard', 'Shin guard'),
         ('sock', 'Sock'),
