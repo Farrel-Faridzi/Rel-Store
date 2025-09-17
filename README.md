@@ -101,10 +101,26 @@ Mengapa JSON lebih populer:
 
 8. Lalu saya membuat dua fungsi yaitu: ```show_xml``` dan ```show_json``` yang return function berupa ```HttpResponse``` yang berisi parameter data hasil query yang sudah diserialisasi menjadi XML atau JSON.
 
-9. Lalu saya membuat dua fungsi lagi yaitu: ```show_xml_by_id``` yang juga return function berupa ```HttpResponse``` yang berisi parameter data hasil query yang sudah diserialisasi menjadi XML atau JSON, namun menyimpan hasil query dari data dengan id tertentu yang terdapat di ```Product```. Saya juga menambahkan try except block untuk antisipasi error ```Product.DoesNotExist```
+9. Lalu saya membuat dua fungsi lagi yaitu: ```show_xml_by_id``` yang juga return function berupa ```HttpResponse``` yang berisi parameter data hasil query yang sudah diserialisasi menjadi XML atau JSON, namun menyimpan hasil query dari data dengan id tertentu yang terdapat di ```Product```. Saya juga menambahkan try except block untuk antisipasi error ```Product.DoesNotExist```.
 
 10. Kemudian saya mengimport 4 fungsi tersebut ke ```urls.py``` dan menambahkannya ke ```urlpatterns```.
 
 #  Apakah ada feedback untuk asdos di tutorial 2 yang sudah kalian kerjakan?
 
 Asdos sangat membantu saat saya bingung membuat tutorial kali ini lebih lancar bagi saya.
+
+# Screenshot hasil akses URL pada Postman:
+
+### XML
+<img width="1129" height="941" alt="image" src="https://github.com/user-attachments/assets/210f3795-5e87-4ef1-8459-971d24f60fc0" />
+
+### JSON
+<img width="1109" height="932" alt="image" src="https://github.com/user-attachments/assets/a04c91e4-28b2-43c9-8ac6-eebcb7461aee" />
+
+### XML by ID
+<img width="1118" height="925" alt="image" src="https://github.com/user-attachments/assets/3485c587-afab-4efd-a584-a3854dbde600" />
+
+### JSON by ID
+<img width="1128" height="931" alt="image" src="https://github.com/user-attachments/assets/dfbbd892-ae9c-4e34-aacb-d9c344ea9f71" />
+
+
