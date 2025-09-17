@@ -3,59 +3,108 @@
 
 ---
 
+# Tugas 3
+
+# Jelaskan mengapa kita memerlukan data delivery dalam pengimplementasian sebuah platform?
+
+### Data delivery = cara dan mekanisme pengiriman data antar-komponen (frontend↔backend, microservices↔microservices, eksternal↔platform). Kita butuh karena:
+
+- Decoupling & scalability — memisahkan pengirim dan penerima (mis. frontend vs backend, service A vs B) supaya masing-masing bisa diskalakan, di-deploy, dan di-develop terpisah.
+
+- Reliability & resiliency — mekanisme seperti message queue (Kafka, RabbitMQ) memungkinkan retry, buffering, dan toleransi gangguan.
+
+- Latency & UX — beberapa kasus membutuhkan real-time (WebSocket/SSE) untuk UX responsif; lainya cukup batch/REST.
+
+- Contract & backward-compatibility — data contract (schema/OpenAPI/JSON Schema) membantu evolusi API tanpa merusak client.
+
+- Security & governance — centralisasi aturan autentikasi, validasi, enkripsi, dan audit trail saat data dikirim.
+
+- Observability — tracing, metrics, logging pada jalur pengiriman memudahkan debugging/performance tuning.
+
+
+# Menurutmu, mana yang lebih baik antara XML dan JSON? Mengapa JSON lebih populer dibandingkan XML?
+
+### JSON: lebih ringan, langsung cocok dengan JavaScript (JSON.parse), mudah dibaca, banyak tooling modern (REST/SPA), payload lebih kecil => populer untuk web API.
+
+### XML: lebih verbose, punya fitur kompleks (namespaces, atribut, XSD, XSLT) => unggul untuk dokumen yang kompleks/terstruktur dan kebutuhan enterprise/legacy (SOAP, dokumen hukum/finance).
+
+Mengapa JSON lebih populer:
+
+- Natural fit untuk web/JS sehingga integrasi front-end lebih mudah.
+
+- Sederhana: format objek/array langsung ter-mapping ke struktur bahasa pemrograman.
+
+- Payload umumnya lebih kecil; parsingnya cepat di browser/server modern.
+
+- Ekosistem RESTful APIs dan microservices mengadopsi JSON sebagai standar de-facto.
+
+- Tooling modern (fetch, axios, banyak library) bekerja mulus dengan JSON.
+
+
+# Jelaskan fungsi dari method ```is_valid()``` pada form Django dan mengapa kita membutuhkan method tersebut?
+
+### Apa yang dilakukan form.is_valid():
+
+- Memanggil full_clean() pada form.
+
+- Untuk tiap field: konversi tipe (to_python), validators, dan pembersihan (clean_<field>).
+
+- Menjalankan clean() tingkat form (cross-field validation).
+
+- Mengisi form.cleaned_data jika valid, atau form.errors jika tidak.
+
+- Mengembalikan True/False.
+
+### Kenapa fungsi ```is_valid()``` dibutuhkan:
+
+- Mencegah pemrosesan input buruk — jangan pernah memakai ```cleaned_data``` tanpa ```is_valid()```; kalau tidak valid, data belum tervalidasi/terkonversi.
+
+- Menjaga integritas dan keamanan — validasi tipe, panjang, pola, nilai unik, dsb.
+
+- UX — ```form.errors``` memberi feedback ke user.
+
+- Integrasi dengan ModelForm — ```is_valid()``` memastikan data bisa dipakai untuk ```form.save()```.
+
+
+# Mengapa kita membutuhkan csrf_token saat membuat form di Django? Apa yang dapat terjadi jika kita tidak menambahkan csrf_token pada form Django? Bagaimana hal tersebut dapat dimanfaatkan oleh penyerang?
+
+### CSRF (Cross-Site Request Forgery) = penyerang membuat permintaan (biasanya POST/state-changing) ke aplikasi target menggunakan browser korban yang sudah terautentikasi. Browser otomatis mengirim cookie (session) sehingga permintaan tampak sah.
+
+### Kenapa csrf_token diperlukan:
+
+- Token yang disisipkan ke form/template bersifat unik/rahasia untuk sesi dan diverifikasi oleh server lewat CsrfViewMiddleware.
+
+- Memastikan request berasal dari halaman yang benar (bukan dari situs luar).
+
+### Jika tidak menambahkan csrf_token:
+
+- Pada Django default, middleware akan menolak POST tanpa token (403). Jika kamu menonaktifkan CSRF atau menandai view @csrf_exempt, aplikasi menjadi rentan.
+
+- Risiko nyata: penyerang bisa memaksa user melakukan aksi yang merugikan (mengubah email/password, mengirimkan transaksi, mem-post konten atas nama user, dll).
+
+
 # Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
 
-### 1. Membuat project Django baru
-Hal pertama yang saya lakukan adalah membuat git repository baru. Setelah itu saya membuat project Django baru bernama Rel-Store dengan memasukkan command ```django-admin startproject Rel_Store.``` di terminal.
+1. Pertama saya menambahkan ```base.html``` ke direktori ```templates``` pada root folder dan memasukkanya ke var ```TEMPLATES``` di settings.py sebagai template dasar untuk halaman web lainnya.
 
-### 2. Setup environment & project awal
-Saya membuat file ```.env``` dan ```.env.prod``` untuk menyimpan konfigurasi penting. selain itu, juga mengaktifkan virtual environment, kemudian menginstall semua dependency yang dibutuhkan melalui ```requirements.txt``` dan membuat file ```.gitignore``` agar semua file yang kurang penting tidak di push ke repository.
+2. Kemudian saya membuat berkas ```forms.py``` untuk membuat struktur form yang menerima data product baru di direktor ```main```, serta mengimport berkas ini ke ```views.py```.
 
-### 3. Konfigurasi settings.py
-Saya memodifikasi file ```settings.py``` pada directory ```Rel_Store``` untuk mengkonfigurasi database agar sesuai dengan yang tertera di tutorial (mengubah database, menambahkan variable ```PRODUCTION```, etc.). Kemuidian jika saya ingin deploy ke ```PWS```, saya juga memasukkan URL baru ke dalam ```ALLOWED_HOSTS``` supaya aplikasi dapat di host melalui ```PWS```, da dapat diakses publik.
+3. Kemudian saya menambahkan fungsi ```create_product``` dan ```show_product``` di ```views.py``` untuk membuat atau melihat product. Lalu saya import kedua fungsi tersebut ke ```urls.py``` dan juga menambahkan path url baru untuk kedua fungsi tersebut.
 
-### 4. Setup URL
-Di dalam ```main/urls.py```, saya mendefinisikan path yang menghubungkan URL dengan fungsi ```home_page```. Dari sini, URL tersebut juga diarahkan ke template HTML (misalnya ```home.html```) untuk menampilkan tampilan frontend.
+4. Saya juga mengupdate code di ```main.html``` untuk menampilkan data product serta tombol ```Add product``` yang akan redirect ke laman form.
 
-### 5. Membuat view dan template
-Di file ```main/views.py```, saya membuat fungsi home_page untuk menampilkan halaman awal aplikasi. Halaman awal ini berisi nama toko saya serta informasi identitas diri (nama, npm dan kelas).
+5. Kemudian saya membuat berkas ```create_product.html``` dan ```prouct_detail.html``` sebagai halaman untuk membuat dan menampilkan data product.
 
-### 6. Membuat model
-Pada ```main/models.py```, saya membuat sebuah model Django bernama Product yang memiliki atribut sesuai kebutuhan Tugas 1. Selain itu, saya menambahkan atribut ```views``` untuk mengetahui berapa kali sebuah produk di lihat oleh pengguna dan ```id``` sebagai penanda produk dalam bentuk ```UUID```.
+6. Saya juga tidak lupa untuk menambahkan entri url proyek pws ke ```CSRF_TRUSTED_ORIGINS``` di ```settings.py```.
 
-### 7. Setup Git dan Deploy ke PWS
-Saya sudah melakukan inisialisasi Git repository, kemudian push project ke ```PWS```. Setelah itu, saya juga deploy project ke GitHub Setelah memastikan aplikasi berjalan dengan baik, saya melakukan penyesuaian terakhir pada ```settings.py``` (menambahkan ```ALLOWED_HOSTS```), lalu melakukan push ulang ke GitHub dan ```PWS``` agar perubahan tersebut ter-deploy.
+7. Kemudian saya membuat melakukan test dengan menambahkan product baru.
 
-### 8. Membuat README.md
-Terakhir, saya membuat file ```README.md``` yang berisi dokumentasi proyek. File ini mencakup link menuju repository GitHub, link aplikasi PWS, serta jawaban dari pertanyaan yang diberikan. Setelah itu, saya kembali melakukan push agar file ```README.md``` tersimpan di repository.
+8. Lalu saya membuat dua fungsi yaitu: ```show_xml``` dan ```show_json``` yang return function berupa ```HttpResponse``` yang berisi parameter data hasil query yang sudah diserialisasi menjadi XML atau JSON.
 
----
+9. Lalu saya membuat dua fungsi lagi yaitu: ```show_xml_by_id``` yang juga return function berupa ```HttpResponse``` yang berisi parameter data hasil query yang sudah diserialisasi menjadi XML atau JSON, namun menyimpan hasil query dari data dengan id tertentu yang terdapat di ```Product```. Saya juga menambahkan try except block untuk antisipasi error ```Product.DoesNotExist```
 
-# Buatlah bagan yang berisi request client ke web aplikasi berbasis Django beserta responnya dan jelaskan pada bagan tersebut kaitan antara ```urls.py```, ```views.py```, ```models.py```, dan berkas ```html```.
+10. Kemudian saya mengimport 4 fungsi tersebut ke ```urls.py``` dan menambahkannya ke ```urlpatterns```.
 
-![Client](https://github.com/user-attachments/assets/2a73dd07-ec03-400f-82c4-7fd2efc34d9c)
+#  Apakah ada feedback untuk asdos di tutorial 2 yang sudah kalian kerjakan?
 
-
-Bagan di atas menunjukkan alur request–response pada aplikasi Django. Ketika client mengirim request, request tersebut pertama kali diarahkan ke ```urls.py``` untuk mencocokkan URL dengan fungsi view yang sesuai. Selanjutnya, ```views.py``` bertugas mengolah logika: jika butuh data, view akan berinteraksi dengan ```models.py``` untuk mengambil atau memodifikasi data di database. Setelah data tersedia, view akan memanggil template HTML untuk menampilkan data dalam bentuk yang terstruktur. Akhirnya, hasil render dikirim kembali sebagai response kepada client. Dengan demikian, keempat berkas ini saling berhubungan dalam memproses request hingga menghasilkan response.
-
----
-
-# Jelaskan peran ```settings.py``` dalam proyek Django!
-File ```settings.py``` berfungsi sebagai pusat konfigurasi untuk proyek Django. Semua pengaturan utama proyek, seperti database, aplikasi yang digunakan (```INSTALLED_APPS```), ```middleware```, ```template```, ```static files```, keamanan (secret key, debug mode), serta daftar host yang diizinkan (```ALLOWED_HOSTS```) didefinisikan di sini.
-
-Dengan kata lain, ```settings.py``` mengatur bagaimana aplikasi Django dijalankan dan berinteraksi dengan server, database, maupun pengguna.
-
----
-
-# Bagaimana cara kerja migrasi database di Django?
-Migrasi database di Django adalah proses yang menghubungkan perubahan pada model di ```models.py``` dengan struktur tabel di database. Ketika kita membuat atau mengubah model, Django menghasilkan file migrasi dengan perintah ```makemigrations``` yang berisi instruksi perubahan, lalu perintah ```migrate``` digunakan untuk menerapkan instruksi tersebut ke database. Dengan mekanisme ini, Django memastikan struktur database selalu sinkron dengan model tanpa perlu menulis query SQL secara manual.
-
----
-
-# Menurut Anda, dari semua framework yang ada, mengapa framework Django dijadikan permulaan pembelajaran pengembangan perangkat lunak?
-Menurut saya, Django dipilih sebagai permulaan pembelajaran pengembangan perangkat lunak karena framework ini bersifat ```batteries``` included, artinya sudah menyediakan banyak fitur bawaan seperti autentikasi, manajemen database, admin panel, hingga sistem routing tanpa harus menginstal banyak library tambahan. Django juga menggunakan pola arsitektur ```Model-View-Template``` yang membantu mahasiswa memahami konsep pemisahan logika, data, dan tampilan dalam aplikasi. Selain itu, Django ditulis dengan Python yang sintaksnya sederhana dan mudah dipahami, sehingga lebih ramah bagi pemula untuk mempelajari konsep fundamental dalam pengembangan web dan perangkat lunak secara umum.
-
----
-
-# Apakah ada feedback untuk asisten dosen tutorial 1 yang telah kamu kerjakan sebelumnya?
-Karena lab yang dilakukan Tutorial 1 dilakukan secara daring, jadi saya tidak banyak berinteraksi dengan asisten dosen. Saya hanya berinteraksi sekali ketika program saya menampilkan error message, dan ketika saya bertanya ke salah satu asisten dosen. Beliau dapat membantu saya hingga program saya dapat berjalan tanpa ada error.
+Asdos sangat membantu saat saya bingung membuat tutorial kali ini lebih lancar bagi saya.
