@@ -43,4 +43,7 @@ Penggunaan cookies tidak sepenuhnya aman secara default, karena cookies bisa dic
 
     Kemudian saya menyimpan cookie baru bernama ```last_login``` yang berisi timestamp di fungsi ```login_user``` dan context pada ```show_main```. lalu, saya menghapus cookie tersebut di fungsi ```logout_user``` , serta menampilkan time stamp terakhir user login di ```main.html```.
 
-4. Terakhir, saya menghubugnkan Model ```Product``` dengan ```User``` dengan import User ke ```models.py``` dan membuat relasi one-to-many antara ```Product``` dan ```User```. kemudian saya menambahkan entry user di fungsi ```create_news``` dan menambahkan filter pada ```show_main``` di ```views.py```. Setelah itu, saya menambahkan tombol filter di ```main.html``` dan nama penjual di ```product_details.html```.
+4. Selanjutnya, saya menghubugnkan Model ```Product``` dengan ```User``` dengan import User ke ```models.py``` dan membuat relasi one-to-many antara ```Product``` dan ```User```. kemudian saya menambahkan entry user di fungsi ```create_news``` dan menambahkan filter pada ```show_main``` di ```views.py```. Setelah itu, saya menambahkan tombol filter di ```main.html``` dan nama penjual di ```product_details.html```.
+
+
+5. Terakhir saya run code di localhost, kemudian membuat 2 akun dummy dengan masing-masing 3 produk dummy untuk test fungsionalitas fitur yang baru saja ditambahkan.
