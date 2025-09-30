@@ -1,24 +1,103 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>{{ product.name }} - Rel Store</title>
+{% endblock meta %}
+
 {% block content %}
-<p><a href="{% url 'main:show_main' %}"><button>← Back to Product List</button></a></p>
+<div class="bg-gray-50 w-full min-h-screen">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-<h1>{{ product.title }}</h1>
-<p><b>{{ product.get_category_display }}</b>{% if product.is_featured %} | 
-    <b>Featured</b>{% endif %}{% if product.is_product_hot %} | 
-    <b>Hot</b>{% endif %}
-    | Views: {{ product.product_views }}</p>
+    <!-- Back Navigation -->
+    <div class="mb-6">
+      <a href="{% url 'main:show_main' %}" 
+         class="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors">
+        ← Back to Main Page
+      </a>
+    </div>
 
-{% if product.image %}
-<img src="{{ product.image }}" alt="Product image" width="300">
-<br /><br />
-{% endif %}
+    <!-- Product Card -->
+    <article class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
 
-<p>{{ product.description }}</p>
+      <!-- Product Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 sm:p-10">
 
-{% if product.user %}
-    <p>Seller: {{ product.user.username }}</p>
-{% else %}
-    <p>Seller: Anonymous</p>
-{% endif %}
+        <!-- Product Image -->
+        <div class="relative">
+          {% if product.image %}
+            <img src="{{ product.image }}" alt="{{ product.name }}"
+                 class="w-full h-72 sm:h-96 object-cover rounded-lg shadow">
+          {% else %}
+            <div class="w-full h-72 sm:h-96 bg-gray-200 flex items-center justify-center text-gray-400 rounded-lg">
+              No Image Available
+            </div>
+          {% endif %}
 
+          <!-- Badges -->
+          <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-600 text-white shadow">
+              {{ product.get_category_display }}
+            </span>
+            {% if product.is_featured %}
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 shadow">
+                ⭐ Featured
+              </span>
+            {% endif %}
+            {% if product.is_popular %}
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 shadow">
+                🔥 Popular
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="flex flex-col justify-between">
+          <div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
+              {{ product.name }}
+            </h1>
+            <p class="text-xl font-bold text-green-700 mb-6">
+              ${{ product.price }}
+            </p>
+            <p class="text-gray-700 text-base sm:text-lg leading-relaxed mb-8">
+              {{ product.description }}
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4">
+            <button 
+              class="flex-1 bg-green-600 text-white px-6 py-3 rounded-md font-semibold shadow hover:bg-green-700 transition-all">
+              🛒 Add to Cart
+            </button>
+            <button 
+              class="flex-1 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-md font-medium hover:bg-gray-50 transition-all">
+              ❤️ Add to Wishlist
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meta Info -->
+      <div class="border-t border-gray-100 px-6 sm:px-10 py-6 bg-gray-50 flex flex-wrap justify-between items-center">
+        <div class="text-sm text-gray-500 flex gap-6">
+          <time datetime="{{ product.created_at|date:'c' }}">
+            Created: {{ product.created_at|date:"M j, Y g:i A" }}
+          </time>
+          <span>{{ product.views }} views</span>
+        </div>
+        <div class="font-medium text-gray-900">
+          Seller: 
+          {% if product.user %}
+            <span class="text-green-700">{{ product.user.username }}</span>
+          {% else %}
+            <span class="text-gray-500">Anonymous</span>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
 {% endblock content %}

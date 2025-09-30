@@ -16,21 +16,29 @@ from django.urls import reverse
 @login_required(login_url='/login')
 def show_main(request):
     filter_type = request.GET.get("filter", "all")
+    category_filter = request.GET.get("category", None)
 
     if filter_type == "all":
         product_list = Product.objects.all()
     else:
         product_list = Product.objects.filter(user=request.user)
-        
+
+    if category_filter:
+        product_list = product_list.filter(category=category_filter)
+
+    product_categories = Product.CATEGORY_CHOICES
+
     context = {
-        'npm' : '2406436240',
+        'npm': '2406436240',
         'name': 'Farrel Faridzi Liwungang',
         'class': 'PBP D',
-        'product_list' : product_list,
-        'last_login': request.COOKIES.get('last_login', 'Never')
+        'product_list': product_list,
+        'last_login': request.COOKIES.get('last_login', 'Never'),
+        'product_categories': product_categories,
     }
-
     return render(request, "main.html", context)
+
+
 
 @login_required(login_url='/login')
 def show_product(request, id):
@@ -120,3 +128,34 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse('main:login'))
     response.delete_cookie('last_login')
     return response
+
+def edit_product(request, id):
+    news = get_object_or_404(Product, pk=id)
+    form = ProductForm(request.POST or None, instance=news)
+    if form.is_valid() and request.method == 'POST':
+        form.save()
+        return redirect('main:show_main')
+
+    context = {
+        'form': form
+    }
+
+    return render(request, "edit_product.html", context)
+
+def edit_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+    form = ProductForm(request.POST or None, instance=product)
+    if form.is_valid() and request.method == 'POST':
+        form.save()
+        return redirect('main:show_main')
+
+    context = {
+        'form': form
+    }
+
+    return render(request, "edit_product.html", context)
+
+def delete_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+    product.delete()
+    return HttpResponseRedirect(reverse('main:show_main'))

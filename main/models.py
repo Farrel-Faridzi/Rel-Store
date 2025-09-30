@@ -5,10 +5,10 @@ from django.contrib.auth.models import User
 class Product(models.Model):
     CATEGORY_CHOICES = [
         ('cleats', 'Cleats'),
-        ('glove', 'Glove'),
-        ('shin guard', 'Shin guard'),
-        ('sock', 'Sock'),
-        ('jersey', 'Jersey'),
+        ('gloves', 'Gloves'),
+        ('shin guards', 'Shin guards'),
+        ('socks', 'Socks'),
+        ('jerseys', 'Jerseys'),
         ('football', 'Football')
     ]
     
