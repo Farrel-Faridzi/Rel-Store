@@ -11,7 +11,6 @@
 <div class="bg-gradient-to-b from-green-50 to-gray-50 w-full pt-20 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-    <!-- Header Section -->
     <div class="mb-10 text-center">
       <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-3">
         ⚽ Latest Football Gear
@@ -21,15 +20,88 @@
       </p>
     </div>
 
-    <!-- Filter Section -->
+    <div class="text-center mb-10">
+      <button id="add-product-button" class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-full shadow-md hover:bg-green-700 hover:scale-105 transition-all">
+          + Add New Product
+      </button>
+    </div>
+
+    <div id="product-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div class="mt-3 text-center">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Add New Product</h3>
+              <div class="mt-2 px-7 py-3">
+                  <form id="product-form">
+                      {% csrf_token %}
+                      <input type="text" name="name" placeholder="Name" class="mb-2 w-full px-3 py-2 border rounded">
+                      <input type="number" name="price" placeholder="Price" class="mb-2 w-full px-3 py-2 border rounded">
+                      <textarea name="description" placeholder="Description" class="mb-2 w-full px-3 py-2 border rounded"></textarea>
+                      <select name="category" class="mb-2 w-full px-3 py-2 border rounded bg-white">
+                          {% for key, value in product_categories %}
+                              <option value="{{ key }}">{{ value }}</option>
+                          {% endfor %}
+                      </select>
+                      <input type="url" name="image" placeholder="Image URL" class="mb-2 w-full px-3 py-2 border rounded">
+                      <div class="items-center px-4 py-3">
+                          <button id="submit-product" type="submit" class="px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300">
+                              Add Product
+                          </button>
+                      </div>
+                  </form>
+              </div>
+              <div class="items-center px-4 py-3">
+                  <button id="close-modal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md w-full">
+                      Close
+                  </button>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <div id="edit-product-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Edit Product</h3>
+                <div class="mt-2 px-7 py-3">
+                    <form id="edit-product-form">
+                        {% csrf_token %}
+                        <input type="hidden" id="edit-product-id" name="id">
+                        <input type="text" id="edit-name" name="name" placeholder="Name" class="mb-2 w-full px-3 py-2 border rounded">
+                        <input type="number" id="edit-price" name="price" placeholder="Price" class="mb-2 w-full px-3 py-2 border rounded">
+                        <textarea id="edit-description" name="description" placeholder="Description" class="mb-2 w-full px-3 py-2 border rounded"></textarea>
+                        <select id="edit-category" name="category" class="mb-2 w-full px-3 py-2 border rounded bg-white">
+                            {% for key, value in product_categories %}
+                                <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="url" id="edit-image" name="image" placeholder="Image URL" class="mb-2 w-full px-3 py-2 border rounded">
+                        <div class="items-center px-4 py-3">
+                            <button id="submit-edit-product" type="submit" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="close-edit-modal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md w-full">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-10 bg-white shadow-sm rounded-xl border border-gray-200 p-5">
       <div class="flex space-x-3 mb-4 sm:mb-0">
         <a href="?" 
            class="{% if request.GET.filter == 'all' or not request.GET.filter %} bg-green-600 text-white {% else %} bg-white text-gray-700 border border-gray-300 {% endif %} px-5 py-2 rounded-full font-medium transition-all hover:scale-105 hover:bg-green-600 hover:text-white">
           All Products
         </a>
+        <button id="refresh-products" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-full font-medium transition-all hover:scale-105 hover:bg-gray-300">
+        🔄 Refresh
+        </button>
         <a href="?filter=my" 
-           class="{% if request.GET.filter == 'my' %} bg-green-600 text-white {% else %} bg-white text-gray-700 border border-gray-300 {% endif %} px-5 py-2 rounded-full font-medium transition-all hover:scale-105 hover:bg-green-600 hover:text-white">
+          class="{% if request.GET.filter == 'my' %} bg-green-600 text-white {% else %} bg-white text-gray-700 border border-gray-300 {% endif %} px-5 py-2 rounded-full font-medium transition-all hover:scale-105 hover:bg-green-600 hover:text-white">
           My Products
         </a>
       </div>
@@ -40,27 +112,277 @@
       {% endif %}
     </div>
 
-    <!-- Product Grid -->
-    {% if not product_list %}
-      <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-16 text-center">
+    <div id="loading-spinner" class="text-center my-10 hidden">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      <p class="mt-2 text-gray-600">Loading products...</p>
+    </div>
+
+    <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-center" role="alert">
+      <strong class="font-bold">Oops!</strong>
+      <span class="block sm:inline">Something went wrong while fetching the products. Please try again later.</span>
+    </div>
+
+    <div id="product_cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    </div>
+
+    <div id="no-product-message" class="hidden bg-white shadow-sm rounded-xl border border-gray-200 p-16 text-center">
         <div class="w-36 h-36 mx-auto mb-6 opacity-80">
-          <img src="{% static 'image/no-product.png' %}" alt="No products available" class="w-full h-full object-contain">
+            <img src="{% static 'image/no-product.png' %}" alt="No products available" class="w-full h-full object-contain">
         </div>
         <h3 class="text-xl font-semibold text-gray-900 mb-2">No Products Yet</h3>
         <p class="text-gray-500 mb-6">Be the first to sell your equipment in Rel Store.</p>
         <a href="{% url 'main:create_product' %}" 
-           class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-full shadow-md hover:bg-green-700 hover:scale-105 transition-all">
-          + Create Product
+          class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-full shadow-md hover:bg-green-700 hover:scale-105 transition-all">
+            + Create Product
         </a>
-      </div>
-    {% else %}
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% for product in product_list %}
-          {% include 'card_product.html' with product=product %}
-        {% endfor %}
-      </div>
-    {% endif %}
+    </div>
 
   </div>
 </div>
+
 {% endblock content %}
+
+{% block script %}
+<script>
+// ===================================================================================
+// BAGIAN 1: FUNGSI DASAR UNTUK MENAMPILKAN DAN MENAMBAH KARTU
+// ===================================================================================
+
+// main.html di dalam <script>
+
+async function getProducts(category = null) { // <-- TERIMA PARAMETER KATEGORI
+    // Bangun URL dengan atau tanpa filter
+    let url = "{% url 'main:show_json' %}";
+    if (category) {
+        url += `?category=${category}`;
+    }
+
+
+    const cardsContainer = document.getElementById("product_cards");
+    const noProductMessage = document.getElementById("no-product-message");
+    const loadingSpinner = document.getElementById("loading-spinner");
+    const errorMessage = document.getElementById("error-message");
+
+    // Sembunyikan konten lama dan tampilkan spinner
+    cardsContainer.innerHTML = "";
+    noProductMessage.classList.add("hidden");
+    errorMessage.classList.add("hidden");
+    loadingSpinner.classList.remove("hidden");
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const products = await response.json();
+        
+        if (products.length === 0) {
+            noProductMessage.classList.remove("hidden");
+        } else {
+            products.forEach((product) => {
+                const card = document.createElement("div");
+                card.className = "bg-white rounded-xl shadow-md overflow-hidden transform hover:-translate-y-2 transition-all duration-300";
+                card.setAttribute('data-card-id', product.pk);
+                
+                card.innerHTML = `
+                    <div class="h-48 overflow-hidden">
+                        <img class="w-full h-full object-cover" src="${product.fields.image || '{% static "image/default.png" %}'}" alt="${product.fields.name}">
+                    </div>
+                    <div class="p-6">
+                        <div class="uppercase text-sm text-green-600 font-bold">${product.fields.category}</div>
+                        <a href="/product/${product.pk}/" class="block mt-1 text-xl leading-tight font-medium text-black hover:underline">${product.fields.name}</a>
+                        <p class="mt-2 text-gray-500 text-lg font-semibold">Rp ${product.fields.price.toLocaleString()}</p>
+                        <p class="mt-2 text-gray-600">${product.fields.description.substring(0, 100)}...</p>
+                        <div class="mt-4 flex justify-between items-center">
+                            <span class="text-xs text-gray-500">${product.fields.views} views</span>
+                            <div class="flex space-x-2">
+                                <button class="edit-button bg-blue-500 text-white px-3 py-1 rounded-md text-xs hover:bg-blue-600" data-id="${product.pk}">Edit</button>
+                                <button class="delete-button bg-red-500 text-white px-3 py-1 rounded-md text-xs hover:bg-red-600" data-id="${product.pk}">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                cardsContainer.appendChild(card);
+            });
+        }
+    } catch (error) {
+        console.error("Fetch error:", error);
+        showErrorState();
+    } finally {
+        loadingSpinner.classList.add("hidden");
+    }
+}
+
+function showErrorState() {
+    const errorMessage = document.getElementById("error-message");
+    errorMessage.classList.remove("hidden");
+}
+
+function addProductToPage(product) {
+    const cardsContainer = document.getElementById("product_cards");
+    const card = document.createElement("div");
+    card.className = "bg-white rounded-xl shadow-md overflow-hidden transform hover:-translate-y-2 transition-all duration-300";
+    card.setAttribute('data-card-id', product.pk);
+
+    card.innerHTML = `
+        <div class="h-48 overflow-hidden">
+            <img class="w-full h-full object-cover" src="${product.fields.image || '{% static "image/default.png" %}'}" alt="${product.fields.name}">
+        </div>
+        <div class="p-6">
+            <div class="uppercase text-sm text-green-600 font-bold">${product.fields.category}</div>
+            <a href="/product/${product.pk}/" class="block mt-1 text-xl leading-tight font-medium text-black hover:underline">${product.fields.name}</a>
+            <p class="mt-2 text-gray-500 text-lg font-semibold">Rp ${product.fields.price.toLocaleString()}</p>
+            <p class="mt-2 text-gray-600">${product.fields.description.substring(0, 100)}...</p>
+            <div class="mt-4 flex justify-between items-center">
+                <span class="text-xs text-gray-500">${product.fields.views} views</span>
+                <div class="flex space-x-2">
+                    <button class="edit-button bg-blue-500 text-white px-3 py-1 rounded-md text-xs hover:bg-blue-600" data-id="${product.pk}">Edit</button>
+                    <button class="delete-button bg-red-500 text-white px-3 py-1 rounded-md text-xs hover:bg-red-600" data-id="${product.pk}">Delete</button>
+                </div>
+            </div>
+        </div>
+    `;
+    cardsContainer.appendChild(card);
+    document.getElementById("no-product-message").classList.add("hidden");
+}
+
+// ===================================================================================
+// BAGIAN 2: LOGIKA MODAL TAMBAH PRODUK (CREATE)
+// ===================================================================================
+
+const addModal = document.getElementById("product-modal");
+const openAddModalBtn = document.getElementById("add-product-button");
+const closeAddModalBtn = document.getElementById("close-modal");
+
+openAddModalBtn.onclick = () => addModal.style.display = "block";
+closeAddModalBtn.onclick = () => addModal.style.display = "none";
+
+const addProductForm = document.getElementById("product-form");
+addProductForm.addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const formData = new FormData(addProductForm);
+    const response = await fetch("{% url 'main:create_product' %}", {
+        method: "POST",
+        body: formData,
+    });
+
+    if (response.status === 201) {
+        const newProduct = await response.json();
+        addProductToPage(newProduct);
+        addModal.style.display = "none";
+        addProductForm.reset();
+    } else {
+        console.error("Failed to add product");
+    }
+});
+
+// ===================================================================================
+// BAGIAN 3: LOGIKA MODAL EDIT & DELETE (UPDATE & DELETE)
+// ===================================================================================
+
+const editModal = document.getElementById("edit-product-modal");
+const closeEditModalBtn = document.getElementById("close-edit-modal");
+const editForm = document.getElementById("edit-product-form");
+
+closeEditModalBtn.onclick = () => editModal.style.display = "none";
+
+// Event Delegation untuk tombol Edit & Delete
+document.getElementById("product_cards").addEventListener("click", async function(e) {
+    // --- Logic untuk tombol DELETE ---
+    if (e.target && e.target.classList.contains('delete-button')) {
+        const productId = e.target.getAttribute('data-id');
+        if (!confirm('Apakah Anda yakin ingin menghapus produk ini?')) return;
+
+        try {
+            const response = await fetch(`/delete-product-ajax/${productId}/`, { method: 'POST' });
+            const data = await response.json();
+            if (data.status === 'success') {
+                e.target.closest('[data-card-id]').remove();
+                showToast(data.message, 'success');
+            } else {
+                showToast(data.message, 'success');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // --- Logic untuk tombol EDIT ---
+    if (e.target && e.target.classList.contains('edit-button')) {
+        const productId = e.target.getAttribute('data-id');
+        const response = await fetch(`/json/${productId}/`);
+        const productData = await response.json();
+        
+        if (productData.length > 0) {
+            const product = productData[0];
+            document.getElementById("edit-product-id").value = product.pk;
+            document.getElementById("edit-name").value = product.fields.name;
+            document.getElementById("edit-price").value = product.fields.price;
+            document.getElementById("edit-description").value = product.fields.description;
+            document.getElementById("edit-category").value = product.fields.category;
+            document.getElementById("edit-image").value = product.fields.image;
+            editModal.style.display = "block";
+        }
+    }
+});
+
+editForm.addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const productId = document.getElementById("edit-product-id").value;
+    const formData = new FormData(editForm);
+
+    try {
+        const response = await fetch(`/product/${productId}/edit`, {
+            method: 'POST',
+            body: formData,
+        });
+        const data = await response.json();
+        if (data.status === 'success') {
+            editModal.style.display = "none";
+            getProducts(); // Refresh semua kartu untuk menampilkan data terbaru
+            showToast(data.message, 'success');
+        } else {
+            showToast('Error updating product.', 'error');
+            console.error(data.errors);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
+
+// Tutup modal jika klik di luar area modal
+window.onclick = function(event) {
+    if (event.target == addModal) {
+        addModal.style.display = "none";
+    }
+    if (event.target == editModal) {
+        editModal.style.display = "none";
+    }
+}
+
+// Fungsi untuk menangani klik pada link kategori
+function handleCategoryClick(event) {
+    // Cek apakah yang diklik adalah link kategori
+    if (event.target.matches('.category-link')) {
+        event.preventDefault(); // Mencegah reload halaman
+        const category = event.target.getAttribute('data-category');
+        getProducts(category); // Panggil getProducts dengan filter
+    }
+}
+
+// Tambahkan event listener ke seluruh dokumen untuk menangkap klik di navbar
+document.addEventListener('click', handleCategoryClick);
+
+// Event listener untuk tombol refresh
+document.getElementById("refresh-products").addEventListener("click", function() {
+    // Cukup panggil ulang fungsi getProducts()
+    getProducts();
+    showToast('Products have been refreshed!', 'success');
+});
+
+// Panggil fungsi ini saat halaman pertama kali dimuat
+document.addEventListener("DOMContentLoaded", () => getProducts());
+
+</script>
+{% endblock script %}

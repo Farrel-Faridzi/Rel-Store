@@ -9,6 +9,32 @@
     <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
   </head>
   <body>
+    <div id="toast-container" class="fixed top-5 right-5 z-[100] space-y-2"></div>
+
     {% block content %} {% endblock content %}
+    {% block script %} {% endblock script %}
+
+        <script>
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            // Animasikan toast masuk
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+
+            // Sembunyikan dan hapus toast setelah 3 detik
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.addEventListener('transitionend', () => toast.remove());
+            }, 3000);
+        }
+    </script>
   </body>
 </html>

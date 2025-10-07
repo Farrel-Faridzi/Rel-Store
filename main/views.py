@@ -8,8 +8,10 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 # Create your views here.
 
@@ -51,19 +53,35 @@ def show_product(request, id):
 
     return render(request, "product_detail.html", context)
 
+@csrf_exempt
 def create_product(request):
-    form = ProductForm(request.POST or None)
+    if request.method == 'POST':
+        form = ProductForm(request.POST or None)
+        if form.is_valid():
+            product_entry = form.save(commit=False)
+            product_entry.user = request.user
+            product_entry.save()
+            return JsonResponse({
+                "status": "success",
+                "pk": product_entry.pk,
+                "fields": {
+                    "name": product_entry.name,
+                    "price": product_entry.price,
+                    "description": product_entry.description,
+                    "image": product_entry.image,
+                    "category": product_entry.category,
+                    "views": product_entry.views,
+                }
+            }, status=201)
+        else:
+            return JsonResponse({
+                "status": "error", 
+                "errors": form.errors.as_json() # Gunakan .as_json() untuk detail
+            }, status=400)
 
-    if form.is_valid() and request.method == 'POST':
-        product_entry = form.save(commit = False)
-        product_entry.user = request.user
-        product_entry.save()
-        return redirect('main:show_main')
 
-    context = {
-        'form': form
-    }
-
+    form = ProductForm()
+    context = {'form': form}
     return render(request, "create_product.html", context)
 
 def show_xml(request):
@@ -72,7 +90,12 @@ def show_xml(request):
     return HttpResponse(xml_data, content_type="application/xml")
 
 def show_json(request):
+    category = request.GET.get('category', None)
+    
     products_list = Product.objects.all()
+    if category:
+        products_list = products_list.filter(category=category)
+    
     json_data = serializers.serialize("json", products_list)
     return HttpResponse(json_data, content_type="application/json")
 
@@ -95,33 +118,63 @@ def show_json_by_id(request, product_id):
     
     
 def register(request):
-    form = UserCreationForm()
+    if request.method == 'POST':
+        # Cek apakah ini request AJAX
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            data = json.loads(request.body)
+            form = UserCreationForm(data)
+        else:
+            form = UserCreationForm(request.POST)
 
-    if request.method == "POST":
-        form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
+            # Untuk AJAX, kembalikan JSON
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'success', 'message': 'Account created successfully! Please login.'})
+            # Untuk non-AJAX, lakukan redirect
             messages.success(request, 'Your account has been successfully created!')
             return redirect('main:login')
-    context = {'form':form}
+        else:
+            # Untuk AJAX, kembalikan error sebagai JSON
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                # Mengambil error dan memformatnya agar mudah dibaca
+                errors = {field: [e for e in error] for field, error in form.errors.items()}
+                return JsonResponse({'status': 'error', 'errors': errors}, status=400)
+    
+    # Untuk request GET, tampilkan halaman register seperti biasa
+    form = UserCreationForm()
+    context = {'form': form}
     return render(request, 'register.html', context)
 
 
 def login_user(request):
-   if request.method == 'POST':
-      form = AuthenticationForm(data=request.POST)
+    if request.method == 'POST':
+        # Cek apakah ini request AJAX
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            data = json.loads(request.body)
+            form = AuthenticationForm(request, data=data)
+        else:
+            form = AuthenticationForm(data=request.POST)
 
-      if form.is_valid():
-        user = form.get_user()
-        login(request, user)
-        response = HttpResponseRedirect(reverse("main:show_main"))
-        response.set_cookie('last_login', str(datetime.datetime.now()))
-        return response
-
-   else:
-      form = AuthenticationForm(request)
-   context = {'form': form}
-   return render(request, 'login.html', context)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            # Untuk AJAX, kembalikan JSON
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'success', 'message': 'Login successful!'})
+            # Untuk non-AJAX, lakukan redirect seperti biasa
+            response = HttpResponseRedirect(reverse("main:show_main"))
+            response.set_cookie('last_login', str(datetime.datetime.now()))
+            return response
+        else:
+            # Untuk AJAX, kembalikan error sebagai JSON
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
+    
+    # Untuk request GET, tampilkan halaman login seperti biasa
+    form = AuthenticationForm()
+    context = {'form': form}
+    return render(request, 'login.html', context)
 
 def logout_user(request):
     logout(request)
@@ -129,33 +182,36 @@ def logout_user(request):
     response.delete_cookie('last_login')
     return response
 
-def edit_product(request, id):
-    news = get_object_or_404(Product, pk=id)
-    form = ProductForm(request.POST or None, instance=news)
-    if form.is_valid() and request.method == 'POST':
-        form.save()
-        return redirect('main:show_main')
-
-    context = {
-        'form': form
-    }
-
-    return render(request, "edit_product.html", context)
-
+@csrf_exempt
 def edit_product(request, id):
     product = get_object_or_404(Product, pk=id)
-    form = ProductForm(request.POST or None, instance=product)
-    if form.is_valid() and request.method == 'POST':
-        form.save()
-        return redirect('main:show_main')
 
-    context = {
-        'form': form
-    }
-
+    if request.method == 'POST':
+        # Proses update data
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'status': 'success', 'message': 'Product updated successfully.'})
+        else:
+            return JsonResponse({'status': 'error', 'errors': form.errors.as_json()}, status=400)
+    
+    # Bagian ini tetap untuk render halaman jika diakses via GET
+    form = ProductForm(instance=product)
+    context = {'form': form}
     return render(request, "edit_product.html", context)
 
 def delete_product(request, id):
     product = get_object_or_404(Product, pk=id)
     product.delete()
     return HttpResponseRedirect(reverse('main:show_main'))
+
+@csrf_exempt
+def delete_product_ajax(request, id):
+    if request.method == 'POST':
+        try:
+            product = Product.objects.get(pk=id)
+            product.delete()
+            return JsonResponse({'status': 'success', 'message': 'Product deleted successfully.'})
+        except Product.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Product not found.'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
