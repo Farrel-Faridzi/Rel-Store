@@ -3,7 +3,7 @@
 
 ---
 
-# Tugas 5
+# Tugas 6
 
  # 1. Apa perbedaan antara synchronous request dan asynchronous request?
 
