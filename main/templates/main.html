@@ -150,11 +150,17 @@
 
 // main.html di dalam <script>
 
-async function getProducts(category = null) { // <-- TERIMA PARAMETER KATEGORI
-    // Bangun URL dengan atau tanpa filter
-    let url = "{% url 'main:show_json' %}";
+async function getProducts(category = null) {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const filterType = urlParams.get('filter') || 'all';
+
+    let url = new URL("{% url 'main:show_json' %}", window.location.origin);
+
+    url.searchParams.append('filter', filterType);
+
     if (category) {
-        url += `?category=${category}`;
+        url.searchParams.append('category', category);
     }
 
 

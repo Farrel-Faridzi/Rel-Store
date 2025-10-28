@@ -92,7 +92,13 @@ def show_xml(request):
 def show_json(request):
     category = request.GET.get('category', None)
     
-    products_list = Product.objects.all()
+    filter_type = request.GET.get('filter', 'all')
+
+    if filter_type == 'my' and request.user.is_authenticated:
+        products_list = Product.objects.filter(user=request.user)
+    else:
+        products_list = Product.objects.all()
+        
     if category:
         products_list = products_list.filter(category=category)
     
