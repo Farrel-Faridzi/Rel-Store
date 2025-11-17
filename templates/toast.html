@@ -1,0 +1,23 @@
+<!-- toast.html -->
+<div id="toast" class="fixed bottom-6 right-6 hidden z-50">
+  <div id="toast-content"
+       class="px-6 py-3 rounded-lg shadow-md text-white bg-green-600 transition-all duration-300">
+    <span id="toast-message"></span>
+  </div>
+</div>
+
+<script>
+function showToast(message, type="success") {
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toast-message');
+  const toastBox = document.getElementById('toast-content');
+
+  toastMsg.textContent = message;
+  toastBox.className = type === "success"
+    ? "px-6 py-3 rounded-lg shadow-md text-white bg-green-600"
+    : "px-6 py-3 rounded-lg shadow-md text-white bg-red-600";
+
+  toast.classList.remove('hidden');
+  setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+</script>

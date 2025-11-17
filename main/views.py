@@ -12,6 +12,10 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
+import requests
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.html import strip_tags
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -221,3 +225,68 @@ def delete_product_ajax(request, id):
         except Product.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Product not found.'}, status=404)
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+def proxy_image(request):
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+    
+    try:
+        # Fetch image from external source
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        # Return the image with proper content type
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
+    
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        name = strip_tags(data.get("name", ""))
+        price_str = data.get("price")
+        description = strip_tags(data.get("description", ""))
+        image = data.get("image", "")
+        category = data.get("category", "jersey") # Default if not provided
+        is_featured = data.get("is_featured", False)
+        
+        # --- Validation ---
+        if not name:
+            return JsonResponse({"status": "error", "message": "Name is required."}, status=400)
+        if not description:
+            return JsonResponse({"status": "error", "message": "Description is required."}, status=400)
+        if price_str is None:
+            return JsonResponse({"status": "error", "message": "Price is required."}, status=400)
+        
+        try:
+            price = int(price_str)
+        except (ValueError, TypeError):
+            return JsonResponse({"status": "error", "message": "Price must be a valid integer."}, status=400)
+
+        # Check for authenticated user
+        user = request.user
+        if not user.is_authenticated:
+            return JsonResponse({"status": "error", "message": "Authentication required."}, status=401)
+
+        # Create the new Product object
+        new_product = Product(
+            name=name,
+            price=price,
+            description=description,
+            image=image,
+            category=category,
+            is_featured=is_featured,
+            user=user
+        )
+        new_product.save()
+        
+        return JsonResponse({"status": "success", "message": "Product created successfully."}, status=200)
+    else:
+        # Use 405 Method Not Allowed for wrong request type
+        return JsonResponse({"status": "error", "message": "Invalid request method."}, status=405)
