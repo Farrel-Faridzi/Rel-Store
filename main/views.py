@@ -12,6 +12,46 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
+import requests
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.html import strip_tags
+from .models import Product
+
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        
+        # 1. Ambil data sesuai field di model Product
+        # Gunakan strip_tags untuk membersihkan input string dari HTML tags
+        name = strip_tags(data.get("name", ""))
+        price = int(data.get("price", 0))  # Pastikan di-cast ke integer
+        description = strip_tags(data.get("description", ""))
+        image = data.get("image", "")      # URLField
+        category = data.get("category", "jersey") # Default value sesuai model
+        is_featured = data.get("is_featured", False) # Boolean
+        
+        user = request.user
+        
+        # 2. Buat object Product baru
+        new_product = Product(
+            name=name,
+            price=price,
+            description=description,
+            image=image,
+            category=category,
+            is_featured=is_featured,
+            user=user
+        )
+        
+        # 3. Simpan ke database
+        new_product.save()
+        
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
 
 # Create your views here.
 
@@ -221,3 +261,54 @@ def delete_product_ajax(request, id):
         except Product.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Product not found.'}, status=404)
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+def proxy_image(request):
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+    
+    try:
+        # Fetch image from external source
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        # Return the image with proper content type
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
+    
+
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        
+        name = strip_tags(data.get("name", ""))
+        price = int(data.get("price", 0))  # Pastikan di-cast ke integer
+        description = strip_tags(data.get("description", ""))
+        image = data.get("image", "")      # URLField
+        category = data.get("category", "jersey") # Default value sesuai model
+        is_featured = data.get("is_featured", False) # Boolean
+        
+        user = request.user
+        
+        # 2. Buat object Product baru
+        new_product = Product(
+            name=name,
+            price=price,
+            description=description,
+            image=image,
+            category=category,
+            is_featured=is_featured,
+            user=user
+        )
+        
+        # 3. Simpan ke database
+        new_product.save()
+        
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
